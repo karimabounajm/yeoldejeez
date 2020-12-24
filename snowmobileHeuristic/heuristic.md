@@ -30,13 +30,27 @@ this will continue to happen until we try every single path, most of which will 
 
 # base cases I'm thinking about
 funny thing is, I've barely started to actually code this. my whiteboard is all marked up though, and I think tonight is going to be a fun night. so the base cases to consider pretty much have to be:
-    if the number of collisions at this node is greater than the previous best number of collisons (try another trans)
-    if the number of collisions at this node is equal to the prev best (you may pass)
-    if the number of collisions at this node is less than the prev best (you may pass + update best in 2d array)
-        if the number is less AND is a coordinate in the previous best path (new best path taking the current path and the rest of the old path; go up one node in the recursive function/)
-    to adjust for overshooting: 
-        if height < speed:
-            if height < speed - 1, then do all transformations except straight down
-            if height < speed - 2, then do all transformations except straight down and speed - 1 down 1 right or left
-            if height < speed - 3, then do all transformations except straight down to speed - 2 down 1 right or left
-            extend the logic from here
+
+    if the number of collisions at this node is greater than the previous best number of collisons 
+    
+        (try another trans)
+    
+    if the number of collisions at this node is equal to the prev best 
+    
+        (you may pass)
+    
+    if the number of collisions at this node is less than the prev best 
+        
+        (you may pass + update best in 2d array):   
+    
+    if the number is less AND is a coordinate in the previous best path:
+        
+        (new best path taking the current path and the rest of the old path; go up one node in the recursive function/)
+    
+    if height < speed (to adjust for overshooting), follow the general trend of:
+    
+        if height < speed - 1, then do all transformations except straight down  
+    
+        if height < speed - 2, then do all transformations except straight down and speed - 1 down 1 right or left  
+        
+        if height < speed - 3, then do all transformations except straight down to speed - 2 down 1 right or left
