@@ -8,15 +8,10 @@ struct gameValues
 {
     // from the txt file
     int height, width; 
-    char** board;
 
     // from the user
     int numTrans, speed;
     int* arrTrans;
-    
-    // array of least number of collisions by point
-    int** bestCol;
-    
 };
 
 // so because we are using a 2d array of ints to describe the current best collisions and an array of 
@@ -49,114 +44,91 @@ struct pathWay
 // speed can be used to use 1d arraya for coordinate changes
 // y = y - abs(max - dx)
 
-// struct pa
 
-// void getTransformations(struct gameValues* gV)
-// { // get speed spit out array of possible transformations
-
-//     printf("Speed: ");
-//     scanf("%d", gV->speed);
-
-//     gV->numTrans = 2 * (gV->speed) - 1; 
-//     int arrNeed = gV->numTrans * 2; //
-//     gV->arrTrans = malloc(sizeof(int) * arrNeed);
-
-//     int horiShift = 1 - maxVal;
-//     int vertiShift = -1;
-
-//     for (int i = 0; i < arrNeed; i++)
-//     {
-//         gV->arrTrans[i] = horiShift;
-//         gV->arrTrans[i+1] = vertiShift;
-
-//         horiShift++;
-//         vertiShift = -(maxVal - abs(horiShift));
-//     }
-    
-//     return gV;
-
-// }
-
-
-struct gameValues* initializeGameValues(char* filename)
+struct gameValues* initializeGameValues()
 {
-    FILE *file = fopen(filename, "r");
-    if (!file) return 0;
+    struct gameValues* inIT = malloc(sizeof(struct gameValues));
 
-    struct gameValues* gV = malloc(sizeof(struct gameValues));
-
-    gV->width = 0; gV->height = 0;
-    char* bufLine; 
-
-    fgets(bufLine, 150, file); gV->width = strlen(bufLine);
-
-    (gV->board[gV->height]) = malloc(sizeof(char) * gV->width);
-    strcpy(bufLine, gV->board[gV->height]); 
-
-    (gV->bestCol[gV->height]) = malloc(sizeof(int) * gV->width);
-    memset(gV->bestCol[gV->height], 0, gV->width);
-    
-    (gV->height)++; 
-
-    while(fgets(bufLine, 150, file))
-    {
-    (gV->board[gV->height]) = malloc(sizeof(char) * gV->width);
-    strcpy(bufLine, gV->board[gV->height]); 
-
-    (gV->bestCol[gV->height]) = malloc(sizeof(int) * gV->width);
-    memset(gV->bestCol[gV->height], 0, gV->width);
-    
-    (gV->height)++; 
-    }
+    inIT->width = 0; inIT->height = 0; // set to zero so that they can be modified in a helper function
 
     printf("Speed: ");
-    scanf("%d", &(gV->speed));
+    scanf("%d", &(inIT->speed));
 
-    gV->numTrans = 2 * (gV->speed) - 1; 
-    gV->arrTrans = malloc(sizeof(int) * gV->numTrans);
+    inIT->numTrans = 2 * (inIT->speed) - 1; 
+    inIT->arrTrans = malloc(sizeof(int) * inIT->numTrans);
 
-    for (int i = 1 - gV->speed; i < gV->speed; i++)
+    for (int i = 1 - inIT->speed; i < inIT->speed; i++)
     {
-        gV->arrTrans[gV->speed - i] = i;
+        // printf("The index is %d and the transformation is %d\n", inIT->speed - i - 1, i);
+        inIT->arrTrans[inIT->speed - i] = i;
     }
 
-    return gV;
+    // for (int i = 1; i <= inIT->numTrans; i++)
+    // {
+    //     printf("This transformation is %d\n", inIT->arrTrans[i]);
+    // }
+    return inIT;
 }
 
-// remember, file must be read in a way that allows it to be printed in a presentable way
-// determined that it must be rectangular, with width 2* the height
 
-
-// void getTransformations(struct gameValues* inIT);
+// char** createBoard(char* filename, struct gameValues* inIT)
 // {
+//     FILE *file = fopen(filename, "r");
+//     if (!file) return 0;
 
+//         fgets(bufLine, 150, file); inIT->width = strlen(bufLine) - 1;
+//     bufLine[inIT->width] = '\0';
+
+//     // printf("The current string is %s\n", bufLine);
+//     // printf("poop\n");
+//     // printf("number of bytes is %lu\n width is %d\n", (sizeof(char) * (inIT->width + 1)), inIT->width);
+
+//     // printf("the width is %d", inIT->width);
+
+//     printf("poop\n");
+//     int sizeLine = (sizeof(char) * (inIT->width + 1));
+//     printf("poop\n");
+//     // (inIT->board[inIT->height]) = malloc(sizeof(char) * inIT->width);
+//     (inIT->board)[0] = "this should work";
+//     printf("poop\n");
+//     printf("String is supposed to be: %s\n", (inIT->board)[inIT->height]);
+
+//     strcpy(bufLine, (inIT->board)[inIT->height]); 
+
+//     printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
+
+//     (inIT->board[0]) = malloc(sizeLine);
+
+//     strcpy(bufLine, inIT->board[inIT->height]); 
+//     printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
+
+//     (inIT->bestCol[inIT->height]) = malloc(sizeof(int) * inIT->width);
+//     memset(inIT->bestCol[inIT->height], 0, inIT->width);
+    
+//     (inIT->height)++; 
+
+
+//     while(fgets(bufLine, 150, file))
+//     {
+//     (inIT->board[inIT->height]) = malloc(sizeof(char) * inIT->width);
+//     bufLine[inIT->width - 1] = '\0';
+
+//     strcpy(bufLine, inIT->board[inIT->height]); 
+//     printf("The current string is %s\n", bufLine);
+
+//     (inIT->bestCol[inIT->height]) = malloc(sizeof(int) * inIT->width);
+//     memset(inIT->bestCol[inIT->height], 0, inIT->width);
+    
+//     (inIT->height)++; 
+//     }
+
+//     // fclose(file);
 // }
 
-
-
-
-
-
-// write initial for loop for going down extrema. this will record: number of collisions at each point, number of collisions in total, and path
-//  note, remember to update current best path, but take it initially as the extrema path
-// create another for loop, decremented from the original for loop, and for each node going up the path (because for loop is used, first coordinate
-//      is not last, instead last is last)
-// while going up the path in the decremeneting for loop, each node has its paths recursively gone down. implement heuristic described below
-
-// create a recursive helper function without all the setup involved in the function that encapsulates it
-
-// for the 2d array for collisions at each point, it does not need to be square like the gameboard, instead having length @row of row*(speed - 1)
-
-
-// recursive function in a for loop, with a starting node being at the new ghost one and it iterating
-// through every possible transformation; the base case to end is if the y coord is 0, but there must be speed - 1 base cases
-// if position is x = speed - 1 away from the bottom, then there are (speed  * 2) - 1 transformation that can't be performed
-
-
-// case 1 if aat bottom
-// case 2 is if current collisions exceeds previous minimum
 
 int main()
 {
-    int* potato;
+    // printf("help me out here bro\n");
+
+    struct gameValues* gV = initializeGameValues();
 }       
