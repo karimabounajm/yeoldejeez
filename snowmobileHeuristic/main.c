@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-// #include "dain.h"
+#include "dain.h"
 
 
 struct gameValues
@@ -67,63 +67,69 @@ struct gameValues* initializeGameValues()
     // {
     //     printf("This transformation is %d\n", inIT->arrTrans[i]);
     // }
+
     return inIT;
 }
 
 
-// char** createBoard(char* filename, struct gameValues* inIT)
-// {
-//     FILE *file = fopen(filename, "r");
-//     if (!file) return 0;
+char** createBoard(char* filename, struct gameValues* inIT)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file) return NULL;
 
-//         fgets(bufLine, 150, file); inIT->width = strlen(bufLine) - 1;
-//     bufLine[inIT->width] = '\0';
+    char gameBoard[][150];
+    printf("we have entered the rage modewww\n");
+    fgets(gameBoard[0], 150, file); 
+    printf("we have entered the rage modewww\n");
+    inIT->width = strlen(gameBoard[0]) - 1;
 
-//     // printf("The current string is %s\n", bufLine);
-//     // printf("poop\n");
-//     // printf("number of bytes is %lu\n width is %d\n", (sizeof(char) * (inIT->width + 1)), inIT->width);
+    int sizeLine = (sizeof(char) * (inIT->width + 1));
+    int Height = inIT->height; int Width = inIT->width;
 
-//     // printf("the width is %d", inIT->width);
+    gameBoard[0][inIT->width - 1] = '\0';
 
-//     printf("poop\n");
-//     int sizeLine = (sizeof(char) * (inIT->width + 1));
-//     printf("poop\n");
-//     // (inIT->board[inIT->height]) = malloc(sizeof(char) * inIT->width);
-//     (inIT->board)[0] = "this should work";
-//     printf("poop\n");
-//     printf("String is supposed to be: %s\n", (inIT->board)[inIT->height]);
 
-//     strcpy(bufLine, (inIT->board)[inIT->height]); 
-
-//     printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
-
-//     (inIT->board[0]) = malloc(sizeLine);
-
-//     strcpy(bufLine, inIT->board[inIT->height]); 
-//     printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
-
-//     (inIT->bestCol[inIT->height]) = malloc(sizeof(int) * inIT->width);
-//     memset(inIT->bestCol[inIT->height], 0, inIT->width);
     
-//     (inIT->height)++; 
+    printf("we have entered the rage modewww\n");
+    // gameBoard[Height] = malloc(sizeof(char) * Width);
+    printf("we have entered the rage mode\n");
+    // gameBoard[0] = "this should work";
+    printf("String is supposed to be: %s\n", gameBoard[0]);
 
+    // strcpy(bufLine, (gameBoard)[Height]); 
 
-//     while(fgets(bufLine, 150, file))
-//     {
-//     (inIT->board[inIT->height]) = malloc(sizeof(char) * inIT->width);
-//     bufLine[inIT->width - 1] = '\0';
+    // printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
 
-//     strcpy(bufLine, inIT->board[inIT->height]); 
-//     printf("The current string is %s\n", bufLine);
+    // (gameBoard[0]) = malloc(sizeLine);
 
-//     (inIT->bestCol[inIT->height]) = malloc(sizeof(int) * inIT->width);
-//     memset(inIT->bestCol[inIT->height], 0, inIT->width);
+    // strcpy(bufLine, gameBoard[Height]); 
+    // printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
+
+    // (inIT->bestCol[Height]) = malloc(sizeof(int) * inIT->width);
+    // memset(inIT->bestCol[Height], 0, inIT->width);
     
-//     (inIT->height)++; 
-//     }
+    // (Height)++; 
 
-//     // fclose(file);
-// }
+
+    // while(fgets(bufLine, 150, file))
+    // {
+    // (gameBoard[Height]) = malloc(sizeof(char) * inIT->width);
+    // bufLine[inIT->width - 1] = '\0';
+
+    // strcpy(bufLine, gameBoard[Height]); 
+    // printf("The current string is %s\n", bufLine);
+
+    // (inIT->bestCol[Height]) = malloc(sizeof(int) * inIT->width);
+    // memset(inIT->bestCol[Height], 0, inIT->width);
+    
+    // (Height)++; 
+    // }
+
+    // inIT->height = Height;
+    fclose(file);
+
+    return gameBoard;
+}
 
 
 int main()
@@ -131,4 +137,5 @@ int main()
     // printf("help me out here bro\n");
 
     struct gameValues* gV = initializeGameValues();
+    createBoard("input.txt", gV);
 }       

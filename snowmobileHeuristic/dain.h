@@ -22,7 +22,13 @@ struct gameValues;
 struct pathWay;
 
 
-struct gameValues* initializeGameValues(char* filename);
+struct gameValues* initializeGameValues();
+
+
+char** createBoard(char* filename, struct gameValues* inIT);
+
+
+int** coordMap(struct gameValues* inIT);
 
 
 void getTransformations(struct gameValues* inIT);
@@ -51,4 +57,4 @@ void newBestPath(struct gameValues* inIT, struct pathWay* curPath, struct pathWa
     // no longer in the best path positive, make all new points negative
 
 
-#endif santa
+#endif 
