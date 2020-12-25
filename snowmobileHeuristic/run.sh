@@ -1,6 +1,6 @@
 #!/bin/bash
   
-gcc main.c -o tempo
+gcc -Wall -Werror main.c -o tempo
 
 if [ $? -ne 0 ]; then
     echo "Failure, you are!"

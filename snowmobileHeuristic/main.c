@@ -36,13 +36,13 @@ struct pathWay
 };
 
 
-
 // add an extra layer to the start of the string that contains the array of the map. that way, we can transition over to
 // beginning of the real map, that we can avoid making the recursive function more complicated
 
 // phase out struct, use global variable
 // speed can be used to use 1d arraya for coordinate changes
 // y = y - abs(max - dx)
+
 
 
 struct gameValues* initializeGameValues()
@@ -63,13 +63,15 @@ struct gameValues* initializeGameValues()
         inIT->arrTrans[inIT->speed - i] = i;
     }
 
+    return inIT;
+}
+
+
     // for (int i = 1; i <= inIT->numTrans; i++)
     // {
     //     printf("This transformation is %d\n", inIT->arrTrans[i]);
     // }
 
-    return inIT;
-}
 
 
 char** createBoard(char* filename, struct gameValues* inIT)
@@ -77,55 +79,32 @@ char** createBoard(char* filename, struct gameValues* inIT)
     FILE *file = fopen(filename, "r");
     if (!file) return NULL;
 
-    char gameBoard[][150];
-    printf("we have entered the rage modewww\n");
-    fgets(gameBoard[0], 150, file); 
-    printf("we have entered the rage modewww\n");
+    // finding the sizes of arrays to avoid having to calculate every time
+    int malPointer = sizeof(char*) * 350; 
+    int malRow = sizeof(char) * 200;
+
+    // defining the board array and its first row, allocating memory for each
+    char** gameBoard = malloc(malPointer);
+    gameBoard[inIT->height] = malloc(malRow);
+
+    // reading the first line from the file
+    fgets(gameBoard[inIT->height], 150, file); 
+
+    // recording the number of characters in each line of the file, and setting 
+    // height to easily accessible variable; note, is one because we did first row
     inIT->width = strlen(gameBoard[0]) - 1;
+    int Height = 1; 
 
-    int sizeLine = (sizeof(char) * (inIT->width + 1));
-    int Height = inIT->height; int Width = inIT->width;
+    while(42)
+    {
+        gameBoard[Height] = malloc(malRow);
+        if(!fgets(gameBoard[Height], 150, file))
+            break;
+        printf("Line %d is %s", Height, gameBoard[Height]);
+        Height++;    
+    }
 
-    gameBoard[0][inIT->width - 1] = '\0';
-
-
-    
-    printf("we have entered the rage modewww\n");
-    // gameBoard[Height] = malloc(sizeof(char) * Width);
-    printf("we have entered the rage mode\n");
-    // gameBoard[0] = "this should work";
-    printf("String is supposed to be: %s\n", gameBoard[0]);
-
-    // strcpy(bufLine, (gameBoard)[Height]); 
-
-    // printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
-
-    // (gameBoard[0]) = malloc(sizeLine);
-
-    // strcpy(bufLine, gameBoard[Height]); 
-    // printf("number of bytes is %lu\n", (sizeof(char) * inIT->width));
-
-    // (inIT->bestCol[Height]) = malloc(sizeof(int) * inIT->width);
-    // memset(inIT->bestCol[Height], 0, inIT->width);
-    
-    // (Height)++; 
-
-
-    // while(fgets(bufLine, 150, file))
-    // {
-    // (gameBoard[Height]) = malloc(sizeof(char) * inIT->width);
-    // bufLine[inIT->width - 1] = '\0';
-
-    // strcpy(bufLine, gameBoard[Height]); 
-    // printf("The current string is %s\n", bufLine);
-
-    // (inIT->bestCol[Height]) = malloc(sizeof(int) * inIT->width);
-    // memset(inIT->bestCol[Height], 0, inIT->width);
-    
-    // (Height)++; 
-    // }
-
-    // inIT->height = Height;
+    inIT->height = Height;
     fclose(file);
 
     return gameBoard;
