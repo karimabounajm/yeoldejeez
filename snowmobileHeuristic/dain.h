@@ -28,7 +28,7 @@ struct gameValues* initializeGameValues();
 char** createBoard(char* filename, struct gameValues* inIT);
 
 
-int** coordMap(struct gameValues* inIT);
+int** createMap(struct gameValues* inIT);
 
 
 void getTransformations(struct gameValues* inIT);
@@ -38,6 +38,9 @@ void addGameboard(struct gameValues* inIT);
 
 
 void checkBestCoord(struct gameValues* inIT);
+
+
+struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* inIT);
 
 
 void gameTime(struct gameValues* inIT, struct pathWay* curPath, struct pathWay* extPath);
