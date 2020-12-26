@@ -6,4 +6,5 @@ if [ $? -ne 0 ]; then
     echo "Failure, you are!"
 else
     ./tempo
+    3
 fi

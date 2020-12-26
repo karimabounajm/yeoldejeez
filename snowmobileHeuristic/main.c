@@ -36,10 +36,21 @@ struct gameValues
 // number of collisions at a particular node at its best is naturally 0. look for ways to distinguish between the two. 
 
 
+// i am fairly certain that writing this using a method similar to the binary tree implementation is possible, as we could write
+// a function or a class using code based on the number of inputs by the user, but honestly I have no idea how to do this yet;
+// think I might revisit the way I do this sometime in the future, to see if using higher order functions is possible.
+// I'm getting this from Silicon valley, dinesh, who said something about writing functions that spit out other functions. he used
+// Java though, so I might have to wait until I learn that and gain some fluency in it.
+
+// the above is (obviously) in reference to the way I am implementing the recursive search. I was just relooking through ecs32b notes
+// and saw the way that the binary tree was searched for using look left/right, and I wonder if writing functions to do something 
+// similar based on the speed the user inputs would be worth looking into; said it would run in n time, but that's probably only if
+// we have a finite and defined number of branches coming out of each node
+
 struct pathWay
 {
     int curHeight; // well be modified based on the x-transformation, given that ∆height is difference between speed and x change
-    int path[]; // plan is to have x transformations in order of transformation, as from the height of the previous instance and the x transformation
+    int path[350]; // plan is to have x transformations in order of transformation, as from the height of the previous instance and the x transformation
     // we can find out how much the height changed (explained just above)
 };
 
@@ -149,6 +160,8 @@ int** createMap(struct gameValues* inIT)
 }
 
 
+// hmmm maybe turn this into a splay tree?
+
 
 struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* inIT)
 {
@@ -159,14 +172,18 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
     for(int h_pos = 0; h_pos < Height; h_pos++)
     {
         w_pos += w_trans;
+        (initialPath->path)[h_pos] = w_pos;
     }
 
+    return initialPath;
 }
 
 
-// this also might need to be modified to reflect the initial ghost layer. we'll see tomorrow,
-// it's call time. EEGLAB drains the soul from me, lordie lordie lord
 
+// for the recursive function, if the best path map has a negative value that is not
+// abs greater than 350 (remember the hardcoded max number of lines) and is also abs more
+// than the current number of collisoins, then we iterate backwards across the transformations 
+// of the current path and modify the best path by your values
 
 int main()
 {
@@ -174,4 +191,16 @@ int main()
     createBoard("input.txt", gV);
     createMap(gV);
 }
-       
+
+
+
+// important notes
+
+// kaloti recommends writing a priority cue (binary heap), which isn't available in C but is in 
+// C++, so consider rewriting in C++ after finishin in C; comparing speeds would be interesting,
+// but finish this first;
+    // mini update, create a ((2 * speed) - 1)ary tree which allows changing the coordinate of 
+    // focus to a particular place in the current 2d array map for coordinate's least #col
+    // this would reduce runtime by allowing us to quickly access the number of coordinates 
+    // in a timely fashion at the particular coordinate. i really like this 
+    // things are getting a bit crazy here, but wowee. 
