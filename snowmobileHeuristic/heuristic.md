@@ -54,3 +54,5 @@ funny thing is, I've barely started to actually code this. my whiteboard is all 
         if height < speed - 2, then do all transformations except straight down and speed - 1 down 1 right or left  
         
         if height < speed - 3, then do all transformations except straight down to speed - 2 down 1 right or left
+
+    if the number of collisions in the best path is 0

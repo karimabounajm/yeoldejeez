@@ -179,11 +179,14 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
 }
 
 
-
 // for the recursive function, if the best path map has a negative value that is not
 // abs greater than 350 (remember the hardcoded max number of lines) and is also abs more
 // than the current number of collisoins, then we iterate backwards across the transformations 
 // of the current path and modify the best path by your values
+// this wouldn't be a problem for fun languages that set initialized but empty places in memory
+// as false, but C has to be special weshel 
+
+
 
 int main()
 {
