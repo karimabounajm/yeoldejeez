@@ -19,7 +19,13 @@ struct gameValues;
 // normal point, and negative if it is a point in the set of best coordinates
 
 
+void deallocateGameValues(struct gameValues* gV)
+
+
 struct pathWay;
+
+
+void deallocatePathWay(struct pathWay* pathInst)
 
 
 struct gameValues* initializeGameValues();
@@ -28,25 +34,24 @@ struct gameValues* initializeGameValues();
 char** createBoard(char* filename, struct gameValues* inIT);
 
 
+void deallocateBoard(char** gameBoard, int numRows)
+
+
 int** createMap(struct gameValues* inIT);
 
 
-void getTransformations(struct gameValues* inIT);
+void deallocateMap(int** bestMap, int numRows);
 
 
-void addGameboard(struct gameValues* inIT);
+int translateCoordArr(int heightCur, int widthCur, int speed, int numRows);
 
 
-void checkBestCoord(struct gameValues* inIT);
+int translateCoordBoard(int boardWidth, int widthCur);
 
 
 struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* inIT);
 
 
-void gameTime(struct gameValues* inIT, struct pathWay* curPath, struct pathWay* extPath);
-
-
-void newBestPath(struct gameValues* inIT, struct pathWay* curPath, struct pathWay* extPath);
 
 // so because we are using a 2d array of ints to describe the current best collisions and an array of 
 // transformations of the x value alone to describe the current best path, it is difficult to identify 
@@ -60,4 +65,4 @@ void newBestPath(struct gameValues* inIT, struct pathWay* curPath, struct pathWa
     // no longer in the best path positive, make all new points negative
 
 
-#endif 
+#endif
