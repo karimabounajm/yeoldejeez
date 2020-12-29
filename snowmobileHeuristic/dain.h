@@ -19,13 +19,13 @@ struct gameValues;
 // normal point, and negative if it is a point in the set of best coordinates
 
 
-void deallocateGameValues(struct gameValues* gV)
+void deallocateGameValues(struct gameValues* gV);
 
 
 struct pathWay;
 
 
-void deallocatePathWay(struct pathWay* pathInst)
+void deallocatePathWay(struct pathWay* pathInst);
 
 
 struct gameValues* initializeGameValues();
@@ -34,7 +34,7 @@ struct gameValues* initializeGameValues();
 char** createBoard(char* filename, struct gameValues* inIT);
 
 
-void deallocateBoard(char** gameBoard, int numRows)
+void deallocateBoard(char** gameBoard, int numRows);
 
 
 int** createMap(struct gameValues* inIT);
