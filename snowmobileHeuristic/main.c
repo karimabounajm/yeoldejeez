@@ -77,6 +77,9 @@ struct pathWay
     int numCollisionsBest, numCollisionsCur;
     int numTransformBest, numTransformCur; 
 
+    // adjusted coordinates for map of best values
+    int mapBest, mapCur;
+
     // array of horizontal transformations, which is indexed by the numTransformations and is used to store the path 
     // from the starting point of each root
     int bestPath[350]; 
@@ -148,7 +151,7 @@ char** createBoard(char* filename, struct gameValues* inIT)
         // printf("Line %d is %s", Height, gameBoard[Height]); // still learning debugger oki?
     }
 
-    inIT->height = Height - 1; // note, Height has extra value from while so -1
+    inIT->height = Height; // note, Height has extra value from while so -1
     // printf("The length of the file is %d\n", inIT->height); // evaluate with file used
 
     fseek(file, 0, SEEK_SET);
@@ -271,37 +274,58 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
     int numRows = inIT->height; int extremaTrans = inIT->speed - 1;
     int numCollisions = 0; int curWidth = 0;
 
+    // iterating through every row given that we only go down 
+    // one row at a time, extrema transformation
     for(int curHeight = 0; curHeight <= numRows; curHeight++)
     {
-        // iterating through every row given that we only go down 
-        // one row at a time, extrema transformation
+        // adjusting current coordinates to fit gameBoard array structure;
         if(gameBoard[curHeight][curWidth % inIT->width] == '#') numCollisions++;
-        bestMap[curHeight][curWidth] = numCollisions;
 
+        // adjusting current coordinate to the bestMap jagged array structure
+        bestMap[curHeight][curWidth + curHeight * extremaTrans] = numCollisions;
+        printf("There is %d collisions at coordinates %d, %d; adjusted coord is %d\n", bestMap[curHeight][curWidth + curHeight * extremaTrans], 
+        	curHeight, curWidth, curWidth + curHeight * extremaTrans);
+
+        // updating the horizontal transformation path, for iterating backwards
         (initialPath->bestPath)[curHeight] = extremaTrans;
         (initialPath->curPath)[curHeight] = extremaTrans;
 
+        // this is the unadjusted coordinate; note, because of the ghost layer used, this
+        // syntax will add an extra value of the extrema transformation to the width, so 
+        // subtract one value of it from the final width
         curWidth += extremaTrans; 
-        // printf("The path is %d at height %d\n", (initialPath->BestPath)[curHeight], curHeight);
     }
 
-    // setting up the values for going from bottoms up with the roots, and from each root top 
-    // down; we go up the coordinates in the path using the height and number of collisions as
-    // methods of identifying position in conjunction with the map and board
+    // subtracting the extra addition to the current widths
+    curWidth -= extremaTrans;
+
+
+    // setting the values for both the current best path and the current path; the current 
+    // best path will be set to the initial path at first, but will shift when the current
+    // meets to conditions to replace the best path
+
+    // number of collisions, separate between two paths
     initialPath->numCollisionsBest = numCollisions;
     initialPath->numCollisionsCur = numCollisions;
 
+    // the height of the paths, which is used to identify the row in question
     initialPath->curHeightBest = numRows;
     initialPath->curHeightCur = numRows;
 
+    // the number of transformations involved in each path, which is used as a way to index
+    // the array of integers used in the path of transformations;
     initialPath->numTransformBest = numRows;
     initialPath->numTransformCur = numRows;
 
+    // the untransformed width, which can be modulo'ed to find the current coordinate in
+    // the gameboard
     initialPath->curWidthBest = curWidth;
     initialPath->curWidthCur = curWidth;
 
-    printf("The number of collisions down this path is %d, with a height of %d and %d number of transformations, and a width of %d\n",
-    initialPath->numCollisionsCur, initialPath->curHeightCur, initialPath->curHeightBest, curWidth);
+    // the horizontal values adjusted to the jagged dynamically allocated structure of the map
+    // of best values by coordinate
+    initialPath->mapBest = curWidth + numRows * extremaTrans;
+    initialPath->mapCur = curWidth + numRows * extremaTrans;
 
     return initialPath;
 }
@@ -324,11 +348,22 @@ int main()
     int** map = createMap(gV);
     struct pathWay* initialPath = findInitial(board, map, gV);
 
-    printf("The number of collisions down this path is %d, with a height of %d and %d number of transformations, and a width of %d\n",
-    initialPath->numCollisionsCur, initialPath->curHeightCur, initialPath->numTransformCur, initialPath->curWidthBest);
+    printf("The number of collisions down this path is %d, with a height of %d and %d number of transformations, and a width of %d\n", initialPath->numCollisionsCur, initialPath->curHeightCur, initialPath->numTransformCur, initialPath->curWidthBest);
+
+    printf("The number of collisions at the end is %d like bro\n", map[320][1600]);
+
+    for(; (initialPath->numTransformCur) >= 0; --(initialPath->numTransformCur))
+    {
+    	printf("The current coordinate is (%d, %d), which has %d colisions. Adjusted witdth is %d; Brrr, time to go up\n", initialPath->curWidthCur, 
+    		initialPath->curHeightCur, map[initialPath->curHeightCur][initialPath->mapCur], initialPath->mapCur);
+
+    	int trans = (initialPath->curPath)[initialPath->numTransformCur];
+    	(initialPath->mapCur) -= (trans + gV->speed - 1); initialPath->curWidthCur -= trans;
+    	(initialPath->curHeightCur)--; (initialPath->numTransformCur)--;
+
+    }
     return 0;
 }
-
 
 
 // important notes
