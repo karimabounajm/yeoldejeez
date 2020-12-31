@@ -49,6 +49,9 @@ int translateCoordArr(int heightCur, int widthCur, int speed, int numRows);
 int translateCoordBoard(int boardWidth, int widthCur);
 
 
+int evaluateBaseCases(struct pathWay* pathsVal, int** map);
+
+
 struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* inIT);
 
 
