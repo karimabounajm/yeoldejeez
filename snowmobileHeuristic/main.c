@@ -132,7 +132,7 @@ int** createMap(struct gameValues* inIT)
 
     // NOTE: positive values in the map indicate the least number of collisions among any path
     // so far explored down a particular coordinate, a negative value distinguishes this 
-    // coordinate as being in the current best path, and a value of -351 indicates that the
+    // coordinate as being in the current best path, and a value of 351 indicates that the
     // current point is unexplored
 
     // starting with an initial width of 1, and increasing the possible width to the range
@@ -142,11 +142,11 @@ int** createMap(struct gameValues* inIT)
     {
         // printf("The row number is %d, and it has a width of %d\n", i, widthRow);
         bestMap[i] = malloc(sizeof(int) * widthRow);
-        memset(bestMap[i], -351, widthRow);
+        memset(bestMap[i], 351, widthRow);
         widthRow += 2 * (speed - 1);
 
-        // values are being defaulted to -351 because the maximum number of lines is hardcoded
-        // to be 350, meaning that there will at most be 350 collisions, so -351 cannot be part 
+        // values are being defaulted to 351 because the maximum number of lines is hardcoded
+        // to be 350, meaning that there will at most be 350 collisions, so 351 cannot be part 
         // of any path, and thus is a negative value that can be distinguished from a coordinate
         // in the best path
     }
@@ -238,6 +238,7 @@ struct pathWay* initializePaths(char** gameBoard, int** bestMap, struct gameValu
 }
 
 
+
 void findBestPath(char* filename)
 {
 	// calling function to initialize values for the board, including height, width, speed, and min movement
@@ -279,12 +280,117 @@ void findBestPath(char* filename)
     	pathsVal->numCollisionCurrent = pathsVal->widthExtrema;
 		pathsVal->mapCurrentAdjusted = pathsVal->widthCurrent + pathsVal->heightCurrent * (pathsVal->speed - 1);
 
-
-
+		// calling the actual recursive function
+		// void recrusiveFunCtion(pathsVal, map, board)
 
     	// adjusting the extrema values (after calling the recursive function at current point, tranform to next)
 	    pathsVal->widthExtrema -= pathsVal->speed;
 	    pathsVal->mapExtremaAdjusted -= 2 * pathsVal->speed;
+    }
+}
+
+
+// void recrusiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int curTrans)
+// {
+// 	int tempPosTrans
+// 	if()
+// }
+
+
+
+void updateBest(struct pathWay* pathsVal, int** map)
+{
+	// updating the best value
+	pathsVal->numCollisionBest -= abs(map[pathsVal->heightCurrent][(pathsVal->widthCurrent)] - pathsVal->numCollisionCurrent);
+
+	// temporary value that holds the index at which the new path ends and the old best path dominates the path
+	int bufferIndexBest = pathsVal->numTransBest;
+	
+	// transform backwards through the best path until the current point (which is a new best path) is reached
+	while(pathsVal->widthBest != pathsVal->widthCurrent && pathsVal->heightBest != pathsVal->heightCurrent)
+	{
+		// update the coordinates of the best path, with the intention of transforming back into the current node
+		pathsVal->widthBest -= pathsVal->bestPath[pathsVal->numTransBest];
+		pathsVal->heightBest -= (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
+
+		// update the number of transformations, which will be used as the starting index 
+		bufferIndexBest--;
+	}
+
+	// temporary value that holds the index at which the current path ends, which we use to continue writing the 
+	// path in 
+	int bufferIndexCurrent = pathsVal->numTransCurrent + 1;
+
+	for(bufferIndexBest++; bufferIndexBest <= pathsVal->numTransBest; bufferIndexBest++)
+	{
+		(pathsVal->currentPath)[bufferIndexCurrent] = (pathsVal->bestPath)[bufferIndexBest];
+		bufferIndexCurrent++;
+	}
+
+	for(int i = 0; i <= bufferIndexCurrent; i++)
+	{
+		(pathsVal->bestPath)[i] = (pathsVal->currentPath)[i];
+	}
+
+	pathsVal->numCollisionBest = bufferIndexCurrent;
+}
+
+
+
+int evaluateBaseCases(struct pathWay* pathsVal, int** map)
+{
+	// if a path with zero collisions has been found, then a better one cannot be found, so the search should end
+	if(pathsVal->numCollisionBest == 0) 
+	{
+		// create exit function over here, essentially prints out the current best path 
+		return 0;
+	}
+
+	// check if the end has been reached
+	if(pathsVal->heightCurrent == pathsVal->numRows) return 1;
+
+	// if the current node has more collisions than a previously explored path in this current node, the node can be
+	// rejected; note, must accomidate for the negative nodes, which denote a best path
+	if(pathsVal->numCollisionCurrent > map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]) 
+	{
+		// this is if the current path has fewer collisions than the best path;
+		if((map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted] < 0) && (pathsVal->numCollisionCurrent < abs(map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted])))
+			updateBest(pathsVal, map);
+
+		// this is if the current path has more collisions than the fewest number of collisions in the map
+		else
+			return -1;
+	}
+
+	// if a transformation could take the player below the expected line, the transformations should be adjusted to
+	// only allow those that would keep the player within bounds
+	if((pathsVal->heightCurrent) > (pathsVal->numRows - pathsVal->speed)) return 2;
+	
+	// check if the node is unexplored, given that 351 is set for all nodes that haven't been explored yet
+	if(map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted] == 351) 
+		{
+			// update this coordinate in the map to include its very first entry
+			map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted] = pathsVal->numCollisionCurrent;
+			return 4;
+		}
+
+	else return 69;
+}
+
+
+
+int main()
+{
+    findBestPath("input.txt");
+    return 0;
+}
+
+
+
+
+
+
+
 
 
     	// printf("The current coordinate is (%d, %d), which has %d colisions. Adjusted witdth is %d and num transformations: %d; Brrr, time to go up\n", 
@@ -297,21 +403,3 @@ void findBestPath(char* filename)
     	// int trans = (extremaArrTrans)[extremaNumTrans];
     	// (pathsVal->mapCurrentAdjusted) -= (trans + gV->speed - 1); pathsVal->widthCurrent -= trans;
     	// (pathsVal->heightCurrent)--; 
-    }
-}
-
-
-// void recrusiveFunCtion(struct pathWay* pathsVal, int** map, char** board, struct gameValues* gV)
-// {
-// 	int tempPosTrans
-// 	if()
-// }
-
-
-
-int main()
-{
-    findBestPath("input.txt");
-    return 0;
-}
-
