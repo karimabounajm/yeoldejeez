@@ -68,8 +68,10 @@ struct gameValues* initializeGameValues()
 
     inIT->width = 0; inIT->height = 0; // set to zero so that they can be modified in a helper function
 
-    printf("Speed: ");
-    scanf("%d", &(inIT->speed));
+    // printf("Speed: ");
+    // scanf("%d", &(inIT->speed));
+
+	inIT->speed = 4;
 
     return inIT;
 }
@@ -192,8 +194,9 @@ struct pathWay* initializePaths(char** gameBoard, int** bestMap, struct gameValu
         // adjusting current coordinates to fit gameBoard array structure;
         if(gameBoard[curHeight][curWidth % inIT->width] == '#') numCollisions++;
 
-        // adjusting current coordinate to the bestMap jagged array structure
-        bestMap[curHeight][curWidth + curHeight * extremaTrans] = numCollisions;
+        // adjusting current coordinate to the bestMap jagged array structure; note, must be negative as this is
+		// temporarily the best path
+        bestMap[curHeight][curWidth + curHeight * extremaTrans] = -numCollisions;
         printf("There is %d collisions at coordinates %d, %d; adjusted coord is %d\n", bestMap[curHeight][curWidth + curHeight * extremaTrans], 
         	curHeight, curWidth, curWidth + curHeight * extremaTrans);
 
@@ -248,7 +251,7 @@ int recursiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int cur
 {
 	// adjust the current values based on the transformation
 	pathsVal->widthCurrent += curTrans;
-    pathsVal->heightCurrent += pathsVal->speed - abs(curTrans);
+    pathsVal->heightCurrent -= pathsVal->speed - abs(curTrans);
 	pathsVal->mapCurrentAdjusted += curTrans;
 
 	// add the transformation into the path of transformations
@@ -268,8 +271,13 @@ int recursiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int cur
 		case 1:
 			break;
 		case 2: {
+			// for cases in which certain transformations would take the player beneath the boundary of the map, the 
+			// VERTICAL movements must be limited, ie the horitzontal movements must be greater than a certain absolute 
+			// value to keep the vertical movement less than the amount that would take the value over the edge
 			int maxTrans = 1 - abs(pathsVal->numRows - pathsVal->heightCurrent);
-			for(int i = maxTrans; i <= abs(maxTrans); i++) 
+			for(int i = -abs(maxTrans); i > pathsVal->speed; i--) 
+				recursiveFunCtion(pathsVal, map, board, i);
+			for(int i = abs(maxTrans); i < pathsVal->speed; i++) 
 				recursiveFunCtion(pathsVal, map, board, i);
 			break;
 		}
@@ -436,7 +444,7 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 		{
 			// update this coordinate in the map to include its very first entry
 			map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted] = pathsVal->numCollisionCurrent;
-			return 4;
+			return 3;
 		}
 
 	else return 3;
@@ -470,7 +478,7 @@ struct pathWay* findBestPath(char* filename)
 
     for(; (pathsVal->numTransExtrema) >= 0; --(pathsVal->numTransExtrema))
     {	
-    	// adjust collisions value of current path as we enter a new pathway with this point as its root node
+		// adjust collisions value of current path as we enter a new pathway with this point as its root node
     	if(board[pathsVal->numTransExtrema][(pathsVal->widthExtrema) % (pathsVal->width)] == '#') 
     	{
     		(pathsVal->numCollisionExtrema)--;
@@ -482,13 +490,38 @@ struct pathWay* findBestPath(char* filename)
     	pathsVal->widthCurrent = pathsVal->widthExtrema;
     	pathsVal->heightCurrent = pathsVal->numTransExtrema;
 		pathsVal->mapCurrentAdjusted = pathsVal->widthCurrent + pathsVal->heightCurrent * (pathsVal->speed - 1);
-
-		// calling the actual recursive function; note the conditional, which fires if a conditional with 0 collisions is found
-		if(recursiveFunCtion(pathsVal, map, board, 0) == 0) return pathsVal;
-
-    	// adjusting the extrema values (after calling the recursive function at current point, tranform to next)
+		
+		// adjusting the extrema values (after calling the recursive function at current point, tranform to next)
 	    pathsVal->widthExtrema -= pathsVal->speed;
 	    pathsVal->mapExtremaAdjusted -= 2 * pathsVal->speed;
+
+		// evaluate the base cases of the recursive function
+		int baseCaseIndex = evaluateBaseCases(pathsVal, map);
+
+		switch(baseCaseIndex)
+		{
+			case 0:
+				return pathsVal;
+			case 1:
+				break;
+			case 2: {
+				// for cases in which certain transformations would take the player beneath the boundary of the map, the 
+				// VERTICAL movements must be limited, ie the horitzontal movements must be greater than a certain absolute 
+				// value to keep the vertical movement less than the amount that would take the value over the edge
+				int maxTrans = 1 - abs(pathsVal->numRows - pathsVal->heightCurrent);
+				for(int i = -abs(maxTrans); i > pathsVal->speed; i--) 
+					recursiveFunCtion(pathsVal, map, board, i);
+				for(int i = abs(maxTrans); i < pathsVal->speed; i++) 
+					recursiveFunCtion(pathsVal, map, board, i);
+				break;
+			}
+			case 3: {
+				int maxTrans = 1 - abs(pathsVal->speed);
+				for(int i = maxTrans; i <= abs(maxTrans); i++) 
+					recursiveFunCtion(pathsVal, map, board, i);
+				break;
+			}
+		}
     }
 
 	deallocateBoard(board, pathsVal->numRows);
