@@ -19,41 +19,49 @@ struct gameValues;
 // normal point, and negative if it is a point in the set of best coordinates
 
 
-void deallocateGameValues(struct gameValues* gV);
-
-
 struct pathWay;
 
 
 void deallocatePathWay(struct pathWay* pathInst);
 
 
-struct gameValues* initializeGameValues();
+struct gameValues* initializeGameValues(void);
 
 
 char** createBoard(char* filename, struct gameValues* inIT);
 
 
-void deallocateBoard(char** gameBoard, int numRows);
-
-
 int** createMap(struct gameValues* inIT);
+
+
+void deallocateBoard(char** gameBoard, int numRows);
 
 
 void deallocateMap(int** bestMap, int numRows);
 
 
-int translateCoordArr(int heightCur, int widthCur, int speed, int numRows);
+struct pathWay* initializePaths(char** gameBoard, int** bestMap, struct gameValues* inIT);
 
 
-int translateCoordBoard(int boardWidth, int widthCur);
+int recursiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int curTrans);
+
+
+void updateBestMapIntersect(struct pathWay* pathsVal, int** map);
+
+
+void updateBestMapNoIntersect(struct pathWay* pathsVal, int** map);
+
+
+void updateBest(struct pathWay* pathsVal, int** map);
 
 
 int evaluateBaseCases(struct pathWay* pathsVal, int** map);
 
 
-struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* inIT);
+struct pathWay* findBestPath(char* filename);
 
+
+#endif
 
 
 // so because we are using a 2d array of ints to describe the current best collisions and an array of 
@@ -66,15 +74,6 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
     // a minor problem that pops up from this is nmaking the coordinates of the current path negative if it becomes a new 
     // best path. we will have to iterate backwards from here, probably make a helper function to do so. make all points
     // no longer in the best path positive, make all new points negative
-
-
-#endif
-
-
-
-
-
-
 
 // so because we are using a 2d array of ints to describe the current best collisions and an array of 
 // transformations of the x value alone to describe the current best path, it is difficult to identify 
@@ -109,9 +108,6 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
 // speed can be used to use 1d arraya for coordinate changes
 // y = y - abs(max - dx)
 
-
-
-
     // the current width and height can be used with the array of previous transformations and the speed from the 
     // game value to backtrack into the previous points; when backtracking, we update the number of collisions at 
     // node by checking if the node we were at before backtracking one instance was a collision, meaning we reduce
@@ -126,14 +122,10 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
     // used to give a value to the current node and serve as an index to the array of horizontal transfromations 
     // respectively, both serving essential functions
 
-
     // adjusted coordinates for map of best values
-
 
     // array of horizontal transformations, which is indexed by the numTransformations and is used to store the path 
     // from the starting point of each root    
-
-
 
 // this function can be based on two different ways of organizing coordinates in the tree; if 
 // we choose to organize tree cordinates by having the initial point be at the midpoint of the
@@ -157,8 +149,6 @@ struct pathWay* findInitial(char** gameBoard, int** bestMap, struct gameValues* 
 //     // note, easier to include in struct the starting value 
 //     //      int mapIndex = (widthCur -  nodeWidth) + (numRows - heightCur) * (speed - 1);
 // }
-
-
 
 // int translateCoordBoard(int boardWidth, int widthCur)
 // {
