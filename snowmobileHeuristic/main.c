@@ -531,9 +531,9 @@ struct pathWay* findBestPath(char* filename)
     	else pathsVal->numCollisionCurrent = pathsVal->numCollisionExtrema;
 
     	// adjust coordinate values of current path 
-    	pathsVal->widthCurrent -=  1;
     	pathsVal->heightCurrent -= 1;
-		pathsVal->mapCurrentAdjusted -= 1;
+		pathsVal->widthCurrent -=  abs(pathsVal->speed) - 1;
+		pathsVal->mapCurrentAdjusted -= abs(pathsVal->speed) - 1;
 		
 		// evaluate the base cases of the recursive function
 		int baseCaseIndex = evaluateBaseCases(pathsVal, map);
@@ -549,7 +549,7 @@ struct pathWay* findBestPath(char* filename)
 				// VERTICAL movements must be limited, ie the horitzontal movements must be greater than a certain absolute 
 				// value to keep the vertical movement less than the amount that would take the value over the edge; ie it
 				// moves away from the center
-				int maxTrans = 1 - abs(pathsVal->numRows - pathsVal->heightCurrent);
+				int maxTrans = abs(pathsVal->speed) - abs(pathsVal->numRows - pathsVal->heightCurrent);
 				for(int i = -abs(maxTrans); i > pathsVal->speed; i--) 
 					recursiveFunCtion(pathsVal, map, board, i);
 				for(int i = abs(maxTrans); i < pathsVal->speed; i++) 
