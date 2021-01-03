@@ -262,6 +262,7 @@ int recursiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int cur
     if(board[pathsVal->heightCurrent][(pathsVal->mapCurrentAdjusted) % (pathsVal->width)] == '#') (pathsVal->numCollisionCurrent)++;
 
 	// evaluate the base cases of the recursive function
+
 	int baseCaseIndex = evaluateBaseCases(pathsVal, map);
 
 	switch(baseCaseIndex)
