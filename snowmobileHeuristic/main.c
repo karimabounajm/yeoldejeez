@@ -442,13 +442,8 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 
 
 
-
-
-
-
-
-
-
+// note, still need to update the paths with the changed/decreased number of collisions on the map and the array itself
+// is in need of testing. I should've spend more time trying to actually finish this over the break
 
 
 // implement heuristic of accessing the array of tranformations from the node on the extrema currently being checked, 

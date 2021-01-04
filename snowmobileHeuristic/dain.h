@@ -52,9 +52,6 @@ void updateBestMapIntersect(struct pathWay* pathsVal, int** map);
 void updateBestMap(struct pathWay* pathsVal, int** map);
 
 
-void updateBest(struct pathWay* pathsVal, int** map);
-
-
 int evaluateBaseCases(struct pathWay* pathsVal, int** map);
 
 
