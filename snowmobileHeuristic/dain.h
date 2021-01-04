@@ -49,7 +49,7 @@ int recursiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int cur
 void updateBestMapIntersect(struct pathWay* pathsVal, int** map);
 
 
-void updateBestMapNoIntersect(struct pathWay* pathsVal, int** map);
+void updateBestMap(struct pathWay* pathsVal, int** map);
 
 
 void updateBest(struct pathWay* pathsVal, int** map);

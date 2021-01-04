@@ -115,7 +115,7 @@ char** createBoard(char* filename, struct gameValues* inIT)
     }
 
 	// note, height and width must be adjusted because they are indexed
-    inIT->height = Height - 1; 
+    inIT->height = Height; 
 	inIT->width = charRow;
 
 	// closing the file
@@ -280,8 +280,8 @@ int recursiveFunCtion(struct pathWay* pathsVal, int** map, char** board, int cur
 	// check if the coordinate the current path transforms into is a collision, and increase the number accordingly
     if(board[pathsVal->heightCurrent][(pathsVal->mapCurrentAdjusted) % (pathsVal->width)] == '#') (pathsVal->numCollisionCurrent)++;
 
-	printf("The best number of collisions at width %d and height %d is %d\n", pathsVal->mapCurrentAdjusted, pathsVal->heightCurrent, 
-		map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]);
+	// printf("The best number of collisions at width %d and height %d is %d\n", pathsVal->mapCurrentAdjusted, pathsVal->heightCurrent, 
+		// map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]);
 
 	// evaluate the base cases of the recursive function
 	int baseCaseIndex = evaluateBaseCases(pathsVal, map);
@@ -355,9 +355,11 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 		// best path has been found with fewer collisions, so they aren't fused together
 		if(pathsVal->numCollisionCurrent < abs(pathsVal->numCollisionBest)) 
 		{
-			updateBestMapNoIntersect(pathsVal, map);
+			updateBestMap(pathsVal, map);
 			updateBest(pathsVal, map);
 		}
+		
+		// this indicates breaking out of the loop of possible transformations
 		return 1;
 	}
 
@@ -371,22 +373,25 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 		// is better than the previous one
 		if(!(pathsVal->mapCurrentAdjusted == pathsVal->mapExtremaAdjusted)) 
 		{
-		printf("The current number of collisions is %d at adjusted width %d and height %d, and the previous best is %d at %d and %d\n", pathsVal->numCollisionCurrent, pathsVal->mapCurrentAdjusted,
-			pathsVal->heightCurrent, pathsVal->numCollisionBest, pathsVal->mapBestAdjusted, pathsVal->heightBest);
+			// printf("The current number of collisions is %d at adjusted width %d and height %d, and the previous best is %d at %d and %d\n", pathsVal->numCollisionCurrent, pathsVal->mapCurrentAdjusted,
+				// pathsVal->heightCurrent, pathsVal->numCollisionBest, pathsVal->mapBestAdjusted, pathsVal->heightBest);
 
-		updateBest(pathsVal, map);
-		updateBestMapIntersect(pathsVal, map);
-		return 1;
+			updateBest(pathsVal, map);
+			updateBestMapIntersect(pathsVal, map);
+			
+			// this indicates breaking out of the loop of possible transformations
+			return 1;
 		}
 
 		else
-		{
+		{ 
+			// this indicates that every possible transformation should be explored
 			return 3;
 		}
 	}
 
 	
-	printf("The previous best numbe of collisions at this point is %d\n", map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]);
+	printf("The previous best number of collisions at this point is %d\n", map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]);
 
 
 	// check if the current path has more collisions than the best path down the current node; this would mean the node is to
@@ -432,62 +437,99 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 
 
 
+// implement heuristic of accessing the array of tranformations from the node on the extrema currently being checked, 
+// thus maximizing efficiency
+
 // this is to update the map for a new best path that intersects with the old one
 void updateBestMapIntersect(struct pathWay* pathsVal, int** map)
 {
 	// variables to hold coordinates to iterate backwards over 
-	int bufferWidth = pathsVal->widthBest; int bufferHeight = pathsVal->heightBest;
-	int bufferAdjustedWidth = pathsVal->mapBestAdjusted;
-	int bufferIndexBest = pathsVal->numTransBest;
+	int bufferHeight = pathsVal->numTransExtrema;
+	int bufferWidth = pathsVal->widthExtrema;
+	int bufferAdjustedWidth = pathsVal->mapExtremaAdjusted;
+	int indexNew = pathsVal->numTransExtrema;
 
 	// these values should not be updated, as this portion of the current best path will be maintained
-	while(bufferAdjustedWidth != pathsVal->mapCurrentAdjusted && bufferHeight != pathsVal->heightCurrent)
+	while(pathsVal->currentPath[indexNew] == pathsVal->bestPath[indexNew])
 	{
 		// update the coordinates of the best path, with the intention of transforming back into the current node
-		bufferAdjustedWidth -= pathsVal->bestPath[pathsVal->numTransBest];
-		bufferHeight -= (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
+		bufferAdjustedWidth += pathsVal->currentPath[indexNew];
+		bufferWidth += pathsVal->currentPath[indexNew];
+		bufferHeight += (pathsVal->speed - abs(pathsVal->currentPath[pathsVal->numTransBest]));
 
 		// update the number of transformations, which will be used as the starting index 
-		bufferIndexBest--;
+		indexNew++;
 	}
 
-	while(bufferIndexBest <= pathsVal->numTransBest)
+	// creating buffer coordinates for replacing old coordinates with positive values
+	int indexRepOld = indexNew;
+	int repOldWidth = bufferAdjustedWidth; int repOldHeight = bufferHeight;
+
+	while(indexRepOld <= pathsVal->numTransBest)
 	{
-		// update the coordinates of the best path, with the intention of transforming back into the current node
-		bufferAdjustedWidth += pathsVal->bestPath[pathsVal->numTransBest];
-		bufferWidth += pathsVal->bestPath[pathsVal->numTransBest];
-		bufferHeight += (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
-		
 		// make this coordinate in the map positive
-		map[bufferHeight][bufferAdjustedWidth] = abs(map[bufferHeight][bufferAdjustedWidth]);
+		map[repOldHeight][repOldWidth] = abs(map[repOldHeight][repOldWidth]);
+
+		// update the coordinates of the best path, with the intention of transforming back into the current node
+		repOldWidth += pathsVal->bestPath[indexRepOld];
+		repOldHeight += (pathsVal->speed - abs(pathsVal->bestPath[indexRepOld]));
 
 		// update the number of transformations, which will be used as the starting index 
-		bufferIndexBest++;
+		indexRepOld++;
 	}
+
+	// creating buffer coordinates for replacing old coordinates with positive values
+	int indexCreateNew = indexNew;
+	int repNewWidthAdjusted = bufferAdjustedWidth; int repNewHeight = bufferHeight;
+	
+	// this will both set in the new coordinates on the map with negative values, but will also update the array of 
+	// transformations on the best path
+	while(indexCreateNew <= pathsVal->numTransCurrent)
+	{
+		// make this coordinate in the map positive
+		map[repNewHeight][repNewWidthAdjusted] = abs(map[repNewHeight][repNewWidthAdjusted]);
+
+		// update the coordinates in the array of values
+		pathsVal->bestPath[indexRepOld] = pathsVal->currentPath[indexCreateNew];
+
+		// update the coordinates of the best path, with the intention of transforming back into the current node
+		repNewWidthAdjusted += pathsVal->currentPath[indexCreateNew];
+		bufferWidth += pathsVal->currentPath[indexCreateNew];
+		repNewHeight += (pathsVal->speed - abs(pathsVal->currentPath[indexCreateNew]));
+
+		// update the number of transformations, which will be used as the starting index 
+		indexCreateNew++;
+	}
+
+	// setting the new values for best path, updating to the current values
+	pathsVal->numCollisionBest = pathsVal->numCollisionCurrent;
+    pathsVal->numTransBest = indexCreateNew;
+    pathsVal->widthBest = bufferWidth;
+    pathsVal->mapBestAdjusted = repNewWidthAdjusted;	
 }
 
 
 
 // this is to update the map for a new best path that does not intersect with the old one
-void updateBestMapNoIntersect(struct pathWay* pathsVal, int** map)
+void updateBestMap(struct pathWay* pathsVal, int** map)
 {
 	// variables to hold coordinates to iterate backwards over 
-	int bufferWidth = pathsVal->widthBest; int bufferHeight = pathsVal->heightBest;
+	int bufferHeight = pathsVal->heightBest;
 	int bufferAdjustedWidth = pathsVal->mapBestAdjusted;
-	int bufferIndexBest = pathsVal->numTransBest;
+	int indexNew = pathsVal->numTransBest;
 
-	while(bufferIndexBest > 0)
+	while(indexNew > 0)
 	{
 		// update the coordinates of the best path, with the intention of transforming back into the current node
 		bufferAdjustedWidth -= pathsVal->bestPath[pathsVal->numTransBest];
-		bufferWidth -= pathsVal->bestPath[pathsVal->numTransBest];
 		bufferHeight -= (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
 
 		// make this coordinate in the map positive
+		// printf("Number of collisions at adjust width %d and height %d is %d\n", bufferAdjustedWidth, bufferHeight, map[bufferHeight][bufferAdjustedWidth]);
 		map[bufferHeight][bufferAdjustedWidth] = abs(map[bufferHeight][bufferAdjustedWidth]);
 
 		// update the number of transformations, which will be used as the starting index 
-		bufferIndexBest--;
+		indexNew--;
 	}
 }
 
