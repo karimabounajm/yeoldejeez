@@ -366,15 +366,32 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 	// the map and the best path. no need to continue down this tree though
 	if((map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted] < 0) && (pathsVal->numCollisionCurrent < abs(map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted])))
 	{
+
+		// check if the current node is on the extrema path; do this to avoid causing the function to interpret that the current path
+		// is better than the previous one
+		if(!(pathsVal->mapCurrentAdjusted == pathsVal->mapExtremaAdjusted)) 
+		{
+		printf("The current number of collisions is %d at adjusted width %d and height %d, and the previous best is %d at %d and %d\n", pathsVal->numCollisionCurrent, pathsVal->mapCurrentAdjusted,
+			pathsVal->heightCurrent, pathsVal->numCollisionBest, pathsVal->mapBestAdjusted, pathsVal->heightBest);
+
 		updateBest(pathsVal, map);
 		updateBestMapIntersect(pathsVal, map);
 		return 1;
+		}
+
+		else
+		{
+			return 3;
+		}
 	}
+
+	
+	printf("The previous best numbe of collisions at this point is %d\n", map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]);
 
 
 	// check if the current path has more collisions than the best path down the current node; this would mean the node is to
 	// be rejected, as it is impossible to get a better path given the tree down the node has already been searched
-	if(pathsVal->numCollisionCurrent > map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]) return 1;
+	if(pathsVal->numCollisionCurrent > abs((map[pathsVal->heightCurrent][pathsVal->mapCurrentAdjusted]))) return 1;
 
 
 	// check if there's a possibility an overshoot may occur
@@ -410,7 +427,7 @@ int evaluateBaseCases(struct pathWay* pathsVal, int** map)
 
 		return 3;
 	}
-	
+
 }
 
 
@@ -424,29 +441,28 @@ void updateBestMapIntersect(struct pathWay* pathsVal, int** map)
 	int bufferIndexBest = pathsVal->numTransBest;
 
 	// these values should not be updated, as this portion of the current best path will be maintained
-	while(bufferWidth != pathsVal->widthCurrent && bufferHeight != pathsVal->heightCurrent)
+	while(bufferAdjustedWidth != pathsVal->mapCurrentAdjusted && bufferHeight != pathsVal->heightCurrent)
 	{
 		// update the coordinates of the best path, with the intention of transforming back into the current node
 		bufferAdjustedWidth -= pathsVal->bestPath[pathsVal->numTransBest];
-		bufferWidth -= pathsVal->bestPath[pathsVal->numTransBest];
 		bufferHeight -= (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
 
 		// update the number of transformations, which will be used as the starting index 
 		bufferIndexBest--;
 	}
 
-	while(bufferIndexBest >= 0)
+	while(bufferIndexBest <= pathsVal->numTransBest)
 	{
 		// update the coordinates of the best path, with the intention of transforming back into the current node
-		bufferAdjustedWidth -= pathsVal->bestPath[pathsVal->numTransBest];
-		bufferWidth -= pathsVal->bestPath[pathsVal->numTransBest];
-		bufferHeight -= (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
-
+		bufferAdjustedWidth += pathsVal->bestPath[pathsVal->numTransBest];
+		bufferWidth += pathsVal->bestPath[pathsVal->numTransBest];
+		bufferHeight += (pathsVal->speed - abs(pathsVal->bestPath[pathsVal->numTransBest]));
+		
 		// make this coordinate in the map positive
 		map[bufferHeight][bufferAdjustedWidth] = abs(map[bufferHeight][bufferAdjustedWidth]);
 
 		// update the number of transformations, which will be used as the starting index 
-		bufferIndexBest--;
+		bufferIndexBest++;
 	}
 }
 
@@ -512,8 +528,6 @@ void updateBest(struct pathWay* pathsVal, int** map)
 
 	pathsVal->numCollisionBest = bufferIndexCurrent;
 }
-
-
 
 
 
