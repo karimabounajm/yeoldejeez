@@ -29,7 +29,7 @@ end
 averageSpikeTrigger = spikeVelocityVector / numSpikes;
 
 % to plot the values, reverse x-axis to show time leading and then plot;
-axes('XDir','reverse')
+% axes('XDir','reverse')
 
 % plotting in a figure, allowing for more diagrams to be plotted next to it
 figure(1)
@@ -38,9 +38,8 @@ subplot(3, 1, 1)
 hold on 
 plot(averageSpikeTrigger)
 
-xlabel('Time Leading')
+xlabel('Time Away from Spike')
 ylabel('Stimulus Potential')
-
 
 
 % convolving the STA just found with the stimulus (without using conv)
@@ -56,15 +55,15 @@ convolvedVector = zeros(1, lenConv);
 % creating new temporary vectors for the STA and the stimulus data, which will be of the same 
 % length to allow for convolution without going past their bounds and causing an error. will be 
 % filled with zeroes
-tempSTA = [averageSpikeTrigger zeros(1, length(stim), 'uint32')];
-tempStim = [stim' zeros(1, length(averageSpikeTrigger), 'uint32')];
+lenSTA = length(averageSpikeTrigger);
+lenStim = length(stim);
 
 % the outer for loop iterating through the indices of the convolution vector itself, not the 
 % component adjusted STA and stim vectors; one more thing, zeros nearly gave me a migrana, it 
 % forms vectors instead of array and is a pain. this nested loop will be insanely long though, 
 % given that it is n^2 with size of 600200; will amend as needed in lab 
-for i=1:lenConv
-    for j=1:lenConv
+for i = 1:lenSTA
+    for j = 1:lenStim
         % checking back on what convolving does mathematically, the convolution vector being 
         % created will hold by index the sum of every product value of the two vectors by time; 
         
@@ -77,11 +76,15 @@ for i=1:lenConv
         % MATLAB has the first vector start at 1 and doesn't have >= conditional, so instead check 
         % if i - j + 1 > 0 instead of i - j ≥ 0
         
-        if(i - j + 1) > 0
-            % again, it irks me off to have to add 1; 
-            convolvedVector(i) = convolvedVector(i) + tempSTA(i) * tempStim(i - j + 1);
-        end                        
+        convolvedVector(i + j - 1) = convolvedVector(i + j -1) + averageSpikeTrigger(i) * stim(j);        
+
     end
 end
 
+subplot(3, 1, 2)
 
+hold on 
+plot(convolvedVector);
+
+xlabel('Time with Resolution of 2ms')
+ylabel('Relative Likelyhood to Fire')
