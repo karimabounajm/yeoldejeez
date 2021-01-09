@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include "dain.h"
 
+// major update idea, realized that there are many nodes that literally cannot be reached despite being the bounds of the 
+// extrema; only two additional possible nodes are added per row, so the memory allocated to the 2d array containing the least
+// cost/best number of collisions at each point can be significantly reduced in size, with 2n + 1 pieces of memory allocated 
+// per row; this is awesome, but will require some extra math work I will implement later. 
+
 
 // important note, what if several paths are skipped down a tree because a best path has been found 
 // in it's node, but it hasn't been properly explored
