@@ -73,6 +73,8 @@ struct gameValues* initializeGameValues()
 }
 
 
+// idea, modify this to be const, which would keep a copy from being created for each and every
+// calling of a function that relates to it
 char** createBoard(char* filename, struct gameValues* inIT)
 {
     FILE *file = fopen(filename, "r");
