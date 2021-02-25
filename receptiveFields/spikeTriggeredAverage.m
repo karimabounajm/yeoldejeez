@@ -30,10 +30,10 @@ end
 % the vector contains the sum of all the snapshots, average them;
 averageSpikeTrigger = spikeVelocityVector / numSpikes;
 
-% to plot the values, reverse x-axis to show time leading and then plot;
-axes('XDir','reverse')
-figure(1)
-plot(averageSpikeTrigger)
+% % to plot the values, reverse x-axis to show time leading and then plot;
+% axes('XDir','reverse')
+% figure(1)
+% plot(averageSpikeTrigger)
 
 
 
@@ -66,10 +66,39 @@ for i = lenSTA:-1:1
     end
 end
 
-figure(2)
-plot(convolvedVector);
+% % plotting the values
+% figure(2)
+% plot(convolvedVector);
 
 
+normalized_vector = convolvedVector/max(convolvedVector);
+lenConv = length(convolvedVector);
+
+% this is the first strategy I used. normalize the convolved vector by
+% dividing by its max, which I don't think is a sound strategy anymore, as
+% there are large values that may be aberations, and taking the max one can
+% introduce error into the analysis. maybe take a weighted average? 
+poissonPrediction = zeros(1, lenConv);
+poisFires = 0;
+
+% this is the number of test runs we want to evaluate the poisson
+% prediction by
+numIterations = 10;
+for i = 1:numIterations
+    for j = 1:lenConv
+        if(normalized_vector(j) > rand) 
+            poissonPrediction(j) = poissonPrediction(j) + 1;     
+            poisFires = poisFires + 1;
+        end
+    end
+end
+
+averagePoissionPrediction = poissonPrediction / numIterations;
+averagePoisFires = poisFires / numIterations;
+
+mean(averagePoissionPrediction)
+mean(rho)
+        
 % next step, create a kernel function which uses the STA to find the relative likelihood of the
 % receptive field firing during an input stimulus through convolving the STA with the stimulus.
 % Might also want to also potentially add the ability to update the STA with the values in the
