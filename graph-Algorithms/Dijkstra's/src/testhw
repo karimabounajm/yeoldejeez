@@ -1,0 +1,168 @@
+#! /bin/bash
+
+executableName=spreader.out
+maxSleep=60     # 1 minutes
+tooLong=0
+errorCount=0
+MakefileScore=0
+
+echo $1
+testerDirectory="/home/ssdavis/36c/p4/Testing"
+
+if [ $# -ne 1 ]; then
+  echo "usage testhw: testhw source_directory" 1>&2
+  exit
+fi
+
+if [[ $1 =~ Testing ]]; then # Use from this directory is not allowed
+  echo "You may not use Testing as your own source directory!"  1>&2
+  exit
+fi
+
+cd $1
+rm -f *.out *.o  core* spreaderRunner* CPUTimer* results* out*.txt  &> /dev/null
+cp  $testerDirectory/spreaderRunner.* $testerDirectory/CPUTimer.h . 
+
+
+echo -n "Scores from p4 for " > results.txt
+
+if [ -e authors.csv ]; then
+  dos2unix -q authors.csv
+  awk -F, {'for (i = 2; i <= NF; ++i) printf"%s ", $i'} authors.csv >> results.txt
+  echo -e "\n"
+  awk -F, 'NR < 4 {for (i = 2; i <= NF; ++i) printf"%s", $i; printf"\n";}' authors.csv > names.txt
+  echo -e "\nNote that format is: e-mail<comma>last name<comma>first name" >> results.txt
+  echo "For example: ssdavis@ucdavis.edu,Davis,Sean"  >> results.txt
+  awk -F, {'printf"%s ", $1'} authors.csv > addresses
+else
+  echo  "You need to create an authors.csv file!!!! No one will receive credit for this assignment"  >> results.txt
+  echo "$1@ucdavis.edu" > addresses
+  finger ${PWD##*/} | awk 'NR == 1 {printf"%s,%s", $5, $4}' > names.txt
+fi
+
+
+echo -en "\nAddresses used: " >> results.txt
+cat addresses >> results.txt
+echo " " >> results.txt
+echo "Directory: $1"
+
+echo "This is a run of p4 with a one minute limit on the time allowed per run."  >> results.txt
+#echo "I  will look at the results tomorrow, and see if any that didn't complete before do now." >> results.txt
+
+echo -n "Scores from p4 for " >> results.txt
+cat names.txt >> results.txt
+
+
+if [ -e *akefile ]; then
+  echo "Makefile optimization check: " >> results.txt
+  cat *akefile* | grep O > temp
+  if [ -s temp ]; then
+    (( errorCount++ ))
+    cat  temp >> results.txt
+    echo "Optimization flag found in Makefile so zero for assignment." >> results.txt
+  else
+    echo "OK" >> results.txt
+  fi
+else
+ echo "No Makefile found so using default, -1 from total." >> results.txt
+ echo "If your code doesn't work with that Makefile, then handin only a Makefile, and e-mail Sean." >> results.txt
+ cp  $testerDirectory/Makefile .
+ MakefileScore=-1
+fi
+ 
+echo "STL check:" >> results.txt 
+egrep "< *(vector|list|queue|deque|map|set|stack|priority_queue|forward_list|unordered_set|unordered_set|array|algorithm) *>" *.cpp *.h > temp
+
+if [ -s temp ]; then
+  (( errorCount++ ))
+  cat temp >> results.txt 
+  echo "STL header found in file(s), so zero for assignment." >> results.txt
+else
+  echo "OK" >> results.txt
+fi
+
+make &> /dev/null
+
+if [ -s $executableName ]; then
+  fileNum=2
+  rm totalTemp &> /dev/null 
+  while [[ $fileNum -lt 5 ]]; do
+    echo "$fileNum:"
+    echo "Testing covid-2000000-10-$fileNum.csv: " >> results.txt
+    echo $executableName $testerDirectory/covid-2000000-10-$fileNum.csv
+    ($executableName $testerDirectory/covid-2000000-10-$fileNum.csv | tail | tee -a totalTemp | awk '{print $8}' > out$fileNum.txt)&
+    count=0 
+
+    while [[ $count -lt $maxSleep ]]; do
+      sleep 1
+      (( count += 1 ))
+      ps | grep $executableName > temp2
+      echo $count
+      if [ ! -s temp2 ]; then
+
+       cat temp 
+       break
+      fi
+   done
+
+    pkill $executableName &> /dev/null
+    rm core &> /dev/null
+
+    if [ ! -s out$fileNum.txt ]; then
+      echo "$executableName did not finish in 1 minutes or seg faulted so you will receive a zero." >> results.txt
+      (( tooLong++ ))
+    else 
+      echo -n "Your days: " >> results.txt
+      cat out$fileNum.txt >> results.txt 
+      echo -n "Sean's days: "  >> results.txt
+      cat $testerDirectory/out$fileNum.txt >> results.txt
+      diff out$fileNum.txt $testerDirectory/out$fileNum.txt > temp
+
+      if [ -s temp ]; then
+        echo "Errors found, so zero for assignment." >> results.txt 
+        (( errorCount++ ))
+      fi # if more than one line in temp
+    fi #if temp not created so didn't finish
+
+    fileNum=$((fileNum + 1))
+  done # while fileNum < 13
+  rm words*.csv &> /dev/null
+  cat totalTemp | awk '/CPU/ {CPU += $3} END {print CPU, int(15 * 3.56 / CPU + 0.9) }' > scores.txt
+  CPUTime=$( awk '{print $1}' scores.txt )
+  CPUScore=$( awk '{print $2}' scores.txt )
+
+  if [[ $CPUScore -gt 20 ]]; then
+    CPUScore=20
+  fi
+
+   echo -e "\nTotal CPU Time: Yours $CPUTime  Sean's: 3.56 so your score is $CPUScore"  >> results.txt
+
+  if [[ $tooLong -gt 0 ]]; then
+    echo 'Total Score: Zero because it did not complete in time.'  >> results.txt
+    finalScore=0
+  else
+    if [[ $errorCount -gt 0 ]]; then
+      echo 'Total Score: Zero because there were errors found while running.' >> results.txt
+      finalScore=0
+    else # everything OK
+      finalScore=$(( $CPUScore + 35 ))
+      echo "Total score: $CPUScore + 35 = $finalScore" >> results.txt
+    fi # if errors
+  fi # if too long 
+else
+  echo "$executableName was not created by make, so zero for assignment." >> results.txt
+fi
+
+
+#mailx -s "ECS 36c P4 Test Results" `cat addresses` < results.txt
+
+
+# awk 'NR == 1 {printf"%s,", $0}' names.txt >> ../results.csv
+# echo " ${1%%/}, $finalScore,$errorCount,$tooLong,$CPUScore" >> ../results.csv
+# authorCount=$(grep "@" authors.csv | wc -l)
+
+# if [ $authorCount -gt 1 ]; then
+#  awk 'NR == 2 {printf"%s,", $0}' names.txt >> ../results.csv
+#  echo "${1%%/},$finalScore,$errorCount,$tooLong,$CPUScore" >> ../results.csv
+# fi
+
