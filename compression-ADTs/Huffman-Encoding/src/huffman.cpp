@@ -13,26 +13,16 @@ int* getCount(const char* filename) {
 	inf >> std::noskipws;
 	char c; char s[128];
 	int* count = new int[128]();
-
-	// iterating so long as the file stream has values, taking every
-	// character one by one and adding it to its place in the values
-	// array, and then skipping past a line when it has no values left
-	// using getline; note, used noskipws to avoid skipping whitespaces
+	/* iterating so long as the file stream has values, taking every
+	character one by one and adding it to its place in the values
+	array, and then skipping past a line when it has no values left
+	using getline; note, used noskipws to avoid skipping whitespaces */
 	while(inf) {
 		while(inf >> c) {
 			count[int(c)]++;
-			// cout << c;
 		}
 		inf.getline(s, 128);
-	} // cout << endl;
-
-	/*
-  	// printing out frequency for debugging
-	for (int i = 0; i < 127; ++i) {
-		if (count[i] > 0) {
-			cout << "There are " << count[i] << " " << char(i) << "'s" << endl;
-		}
-	} */
+	} 
 	return count; 
 }
 
@@ -44,7 +34,6 @@ Node* createTree(int* values) {
 			inorder.insert(NodePtr(buf));
 		}
 	} 
-
 	while(!(inorder.isEmpty())) {
 		NodePtr buf1;
 		inorder.deleteMin(buf1);
@@ -73,7 +62,6 @@ void printTree(struct Node* node, int count, bool* path) {
  
     /* then print the data of node */
 	if(node->ch != '\0') {
-		//   cout << setw(12) << a << '#' << "suck my dick " << endl;
     	cout << node->ch << setw(5) << node->frequency << ' ';
 		for(int i = 0; i < count - 1; i++) cout << path[i];
 		cout << endl;

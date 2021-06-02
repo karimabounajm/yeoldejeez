@@ -13,9 +13,8 @@ LeafNode::LeafNode(int LSize, InternalNode *p,
   values = new int[LSize];
 }  // LeafNode()
 
-// LeafNode::~LeafNode() {
-//   cout << "destroying LeafNode" << endl;
-// }
+LeafNode::~LeafNode() { }
+
 /*
 adding value to neighbor, which occurs when they have available
 space and we would like to insert values; */
@@ -123,7 +122,6 @@ int LeafNode::popMinimum() {
     return buf;
   }
   else {
-    // cout << "this should not be happening" << endl;
     return 0;
   }
     
@@ -186,25 +184,21 @@ LeafNode* LeafNode::remove(int value) {
 
   if(count < (leafSize + 1) / 2 && parent) {
     if(this->getLeafLeft() && leftSibling->getCount() > (leafSize + 1) / 2) {
-      // cout << "LeafNode::remove  adding from left" << endl;
       addFromLeft(); 
       return NULL;
     }
 
     else if(leftSibling) {
-      // cout << "LeafNode::remove  merging to left" << endl;
       mergeLeft();
       return this;
     }
 
     else if(this->getLeafRight() && rightSibling->getCount() > (leafSize + 1) / 2) {
-      // cout << "LeafNode::remove  adding from right" << endl;
       addFromRight(); 
       return NULL;
     }
 
     else if(rightSibling) {
-      // cout << "LeafNode::remove  merging to right" << endl;
       mergeRight();
       return this;
     }
@@ -212,7 +206,6 @@ LeafNode* LeafNode::remove(int value) {
     else return this;
   }
   else {
-    // cout << "LeafNode::remove  shaving a number off" << endl;
     if(first != values[0] && parent)
         parent->resetMinimum(this);
     return NULL;
