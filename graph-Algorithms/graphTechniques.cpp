@@ -154,8 +154,8 @@ the tree while Kruskal's allows the connection of any vertices so long as they d
 cycle, something which can be easily determined by checking the root of the vertices given that
 unions are being used. 
 	Summary:
-	• Prim's: O(V^2), best for dense graphs
-	• Kruskal's: O(E * logV)
+	• Prim's: O(V^2), best for dense graphs
+	• Kruskal's: O(E * logV), best for sparse graphs 
 */
 
 
