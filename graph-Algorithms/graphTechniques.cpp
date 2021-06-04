@@ -8,19 +8,15 @@ Representing Information:
 	Determine sparse or dense graph, for deciding between an adjacency matrix and list
 	• sparse is adjancency list, if used explain ADT used and how data is sorted
 	• dense is adjacency matrix, array; if it is not array then must describe
-
-
-dijkstra table inside the vertices
-justifications only one sentence
+*/
 
 
 /* Traversing Definitions
-  A vertex is essentially a node or a quanta of data, and can be connected to another vertex in 
+  	A vertex is essentially a node or a quanta of data, and can be connected to another vertex in 
 hat is called an edge.
-  An edge can be directed, meaning that the connection between nodes is bidirectional, or it can 
+  	An edge can be directed, meaning that the connection between nodes is bidirectional, or it can 
 be undirected, which means that edges are reflexive in their connective properties. 
 	A loop is a vertex that is connected to itself
-
 	Paths are sequences of vertices connected by edges, with a length equal to the number of edge
 in the given sequence. 
 	Simple Paths are paths in which no vertex is repeated
@@ -33,7 +29,8 @@ or vertices with no incoming edges
 	Strongly Connected Graphs are directed graphs in which a path exists between every vertex
 	Weakly Connected Graphs are directed graphs that don't have connections between every vertex,
 however if the edges were undirected would be strongly connected
-	Complete Graphs are graphs in which every vertex shares an edge with all the other vertices */
+	Complete Graphs are graphs in which every vertex shares an edge with all the other vertices 
+*/
 
 
 /* Representing Graphs
@@ -51,7 +48,9 @@ adjacency list in the elements themselves
 and in each element had a smaller array/list of all the other vertices and their cost, which in
 context is the intervals at which one person visits another. the elements also contained the 
 previous cost of the element itself, a bool for if the element has been "visited", and the 
-number of other vertices a given vertex visits, to iterate over the array */
+number of other vertices a given vertex visits, to iterate over the array. this is essentially
+a jagged array, neither a square matrix or an adjacency list
+*/
 
 
 /* Sorts
@@ -61,12 +60,13 @@ from the graph, forming more, until every vertex in the graph is removed. essent
 algorithm removes every vertex in a given graph with an indegree of zero, with each removal 
 resulting in more vertices having indegrees of zero. 
 	Efficient Topological sorts, with complexity O(Edges + Vertices), involve an initial search 
-through the graph to find all the root vertices, and placing all of them in a queue. as each 
-vertex is dequeued and removed from the graph, the vertices it is connected to by its outward 
-edges have their indegree decremented, which is then checked. each vertex that subsequently 
-becomes a root node is then itself added to the queue to be decremented. all the vertices in 
-the queue at any given time through the algorithm must result in the creation of at least one
-other root node
+to find all root vertices (no inward edges), and placing all of them in a queue. as each vertex 
+is dequeued and removed from the graph, the vertices it is connected to by its outward edges
+have their indegree decremented, which is then checked. each vertex that subsequently becomes 
+a root node is then itself added to the queue to be decremented. removing the vertices in the 
+queue at any given time through the algorithm must result in the creation of at least one other 
+root node or the a finished topological sort.
+*/
 
 
 /* Shortest Path Analysis
@@ -78,18 +78,23 @@ the sum of the weight of each edge
 	Negative Cost Cycle is the potential loop in which a path is repeated infinitely because it
 includes a negative edge, and the purpose of a minimum algorithm is to minimize the cost of the 
 path between two vertices, and going through a cycle with a negative edge reduces the cost
-	Applications of shortest path analysis include minimizing cost between two vertices, meaning 
-that */
+	Applications of shortest path analysis include minimizing cost between two vertices, which
+can be implemented by using the first finding of the destination vertex as the end condition
+*/
 
 
-/* Search Types
+/* Breadth First Search
 	Breadth First Search involves to evaluation of vertices immediately connected to starting 
 vertex before going on to process other, farther away, vertices. essentially, it involves 
 exploring all the vertices a starting vertex is connecting to, giving info regarding the vertex
 that discovered them, the cost of discovering them, and confirming that they've been explored. 
 after each discovery, the vertices themselves are queued up to be explored. in dijkstra's, this
 queue is a min heap, where the vertex with the least cost is what is removed from the heap and 
-explored. vertices that are already explored do not subsequently need to be re-evaluated */
+explored. vertices that are already explored do not subsequently need to be re-evaluated.
+	Breadth First Search is often used to enqueue edges in a single step within a larger algorithm,
+with Dijkstra using depth first whenever a vertex is dequeued in the sense that every undiscovered
+vertex that the one unqueued has an edge of less cost to is added to the priority queue (minheap).
+*/
 
 
 /* Dijkstra's
@@ -115,7 +120,8 @@ empty elements, minimizing time lost. using a dense graph with the priority queu
 would not be a good idea, something that is clear from its complexity O(E*logV + V*logV), as it
 would add a multiplier to a large value if edges E was large. 
 	Dijkstra requires starting points, and has accumulative weights. what it returns is dependent
-on what point it starts at. */
+on what point it starts at. 
+*/
 
 
 /* Minimum Spanning Trees
@@ -125,14 +131,29 @@ because it includes every vertex in the original graph, and it is minimum just b
 minimum spanning tree of a graph has V - 1 edges, with V being the number of vertices in the 
 original graph. the insertion of a new edge creates a cycle, one which must be broken by 
 removing an edge from within the cycle. that edge is the one with the greatest weight. 
-	Kruskal's is good for sparse graphs, as it has a complexity of O(E*logE)
 	Prim's Algorithm creates a minimum spanning tree by growing it in succcessive stages. each 
 stage involves picking a vertex as a root of a tree and adding an edge, and thus a vertex, to 
 it. the algorithm works by finding the edge of least cost at every stage between a vertex that
 is in the tree and a vertex that hasn't yet been added to it. essentially, that makes the 
-algorithm like Dijkstra's width each phrase involving finding the minimum cost between O(E*logV)
-Prims is best for dense graphs
-	No distinguished vertex as the starting point
+algorithm like Dijkstra's with each phase involving finding the minimum cost. The algorithm is 
+O(V^2) without priority queues, which is optimal for dense graphs, and O(E * logV) when binary
+heaps are used to sort the edges for sparse graphs. Don't use Prim's for sparse graphs though,
+too much overhead in comparison to Kruskal's for the task given condition of adding vertex
+	Kruskal's involves sorting the edges by increasing cost using buildheap, building it in 
+linear time, and essentially removing minimum edges one by one, connecting vertices together
+if connecting them does not form a cycle. This means that multiple sub trees can be formed, 
+and continue to form until all are connected as edges are removed from the min heap. This runs 
+in O(E * logV), and is good for sparse graphs. The number of vertices is always essentially  
+greater than the number of edges, however if there are a minimal number of edges then 
+E*logV < V^2. 
+	Prim's and Kruskal's are distinguished by the qualifications for edges being added to the 
+tree that is being formed. In Prim's the edge that is added has to connect a vertex already in
+the tree while Kruskal's allows the connection of any vertices so long as they do not form a 
+cycle, something which can be easily determined by checking the root of the vertices given that
+unions are being used. 
+	Summary:
+	• Prim's: O(V^2), best for dense graphs
+	• Kruskal's: O(E * logV)
 */
 
 
@@ -142,32 +163,49 @@ roots, ie have no incoming edges, and enqueue them. repeat this process with the
 that are created by the process, until there are no vertices left. this only works on directed
 acyclic graphs
 	Critical Path Analysis involves going through the list sorted by the topological sort and 
-determining the slack of each of the vertices/tasks, which essentially means how much they can
-be delayed. the slack of any given task is equal to the difference between its completion time
-and the greatest/longest completion time of the tasks in the given layer. furthermore, the 
-sort itself yields important insight as to the minimum time required to complete a given project
-or directed acyclic graph 
-	The critical path itself is the path in which every edge has a slack of 0 */
+forming a graph directed acyclic graph in which every vertex has a completion time that is 
+equal to the maximum completion time of the edges leading into it. The first completion times 
+are formed from the edges from the roots into the tasks they are prerequisites for. This 
+continues until all the tasks are completed, and each task has its own completion time 
+determined by the maximum of its children's completion time. Note that a ghost edge is used to
+connect all the final or leaf tasks together, and itself has a completion time of the maximum 
+of its children. its completion time is the minimum completion time for the given project. 
+	From the final vertex and its completion time, or the minimum completion time for the 
+project, slack is determined by finding the difference between the latest start time and the 
+earliest start time at each vertex. The latest start time is the difference between the 
+minimum earliest start time of every vertex a given vertex is connected to and the expected time
+required for the completion of the vertex that has outward edges to the vertices in question. 
+The minimum start time is already found, and calculating the maximum is calculated as just 
+decribed
+	Slack essentially means the number of units of time a given task can be delayed without 
+causing the project's minimum completion time to decrease. Critical Path is the path in this 
+tree in which every edge has a slack of 0. Multiple critical paths can exist, and they signify
+a sequence of tasks in which no delays are permitted.
+*/
 
 
 /* Articulation Points
 	Articulation Points are essentially vertices in a graph that, if removed, would result in 
 the graph becoming disjoint, ie it splitting such that not all vertices can reach one another.
 They are found by using a depth first search to number all the vertices in the graph, and while
-doing so also recoding the least number any given vertex can reach through its first backedge;
-	If a given vertex has a child with a low greater than or equal to the least of the number 
-of the current vertex, than the vertex is an articulation apoint. this is because the ;
+doing so also recording the least number any given vertex can reach through its first backedge
+	If a given vertex has a child with a low greater than or equal to its number, as determined 
+by the initial depth first search, then that vertex is an articulation point. This is how the 
+actual process of finding all the articulation points works:
 	Depth First Search is performed on a given graph, numbering the vertices as they are passed,
 with the number assigned to each vertex being Num(v). Afterward, the minimum of every vertex is
-computeted, with the minimum being the least value of Num(v) that can be reached by a given 
-vertex by traversing through its edges and a single backedge. this least value is reached by 
+computed, with the minimum being the least value of Num(v) that can be reached by a given 
+vertex by traversing through its edges and a single backedge. This least value is reached by 
 taking the first vertex that has a backedge that the vertex can question can access. Low(v) can 
-be computed in O(V + E) time, as it essentially involves a postorder traversal;
+be computed in O(V + E) time, as it essentially involves a postorder traversal.
 	NOTE: C is an articulation point IF AND ONLY IF given a vertex G that is a child of C, the 
 Low(G) ≥ Num(C). So the number of the vertex must be less than or equal to the lowest traversal
-ID that one of its children is connected to 
-	Used in the identification of bottlenecks and the desigining of redundancies */
+ID that one of its children is connected to.
+	Used in the identification of bottlenecks and the desigining of redundancies 
+*/
+
 
 /* Network Flow
-Max flow * big-O of dijkstra
-
+	Big O(Max flow * big-O of dijkstra). This one is pretty simple, just dijkstra away until 
+there are no paths from sources to sinks
+*/

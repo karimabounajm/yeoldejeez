@@ -1,5 +1,8 @@
 
 
+
+
+
 /* Insertion Sort
 	Insertion Sort involves traversing a given array index by index, and at every new 
 index moving the element in the index element by element until it reaches a defined
@@ -19,6 +22,7 @@ to its right, which are in the larger unsorted array, are themselves unsorted. o
 that sorts out sub arrays of discrete information sorted in a complex but efficient
 way. 
 */
+
 
 /* Shellsort
 	Shellsort essentially involves the insertion sorting of elements with keys that 
@@ -74,7 +78,6 @@ but comparing objects often is relatively cheap because the compiler aggressivel
 performs inline optimization.
 */
 	
-
 
 /* Quick Sort
 	Quick sort essentially involves sorting the elements of an array as greater than
