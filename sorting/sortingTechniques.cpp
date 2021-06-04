@@ -51,7 +51,8 @@ to max. This is because the maximum of the heap is always sent to the back. Same
 for min heap. The buildheap for N elements is O(N) avg. This is followed by N O(logN)
 deletions, which means that the total complexity is O(N*logN)
 	They are known for their consistent runtimes, with the ADT operations involved
-almost always being consistent and having minimal worst cases. 
+almost always being consistent and having minimal worst cases. This is perfect for
+backward sorted values, as insertion into the binary heap would be O(1). 
 */
 
 
@@ -111,7 +112,16 @@ second by hundreds, etc until the largest number of digits in a number is sorted
 that as the digit value increases in the sort past the number of digits of an element in 
 the array of data, it is automatically relegated to the zeroes position in the sorting 
 array of 0 to 9. This is desired.
+	
 
+// Shell sort is best for small numbers
+
+// M is range of radix
+// Short range for a bunch of numbers is radix sort, is not nlogn, is N log(radix) M 
+// bucket is O(N + M); no need
+
+
+articulation problem is guaranteed 
 
 
 

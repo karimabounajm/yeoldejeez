@@ -7,7 +7,9 @@
 Representing Information:
 	Determine sparse or dense graph, for deciding between an adjacency matrix and list
 	• sparse is adjancency list, if used explain ADT used and how data is sorted
+	  V + E for adjancency list
 	• dense is adjacency matrix, array; if it is not array then must describe
+	  V^2 for building adjacency matrix
 */
 
 
