@@ -101,3 +101,46 @@ element in the array, the rightmost element in the array, and the element in the
 middle, the index of which is determined by the sum of the indices of the rightmost
 and leftmost elements divided by two. pretty intuitive.
 */
+
+
+
+/* Radix Sort
+	Radix Sort involves the incremental sorting of numbers by increasing digit position,
+with the first sort involving the sorting of numbers by their first digit (tens), 
+second by hundreds, etc until the largest number of digits in a number is sorted. Note 
+that as the digit value increases in the sort past the number of digits of an element in 
+the array of data, it is automatically relegated to the zeroes position in the sorting 
+array of 0 to 9. This is desired.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
