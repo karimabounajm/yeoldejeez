@@ -2,7 +2,7 @@
 #define VACCINEROUTER_H
 
 #include "VaccineRunner.h"
-#include "StackAr.h"
+#include "MinHeap.h"
 
 
 class EdgeRoute 
@@ -54,7 +54,7 @@ public:
 	EdgeRoute final;
 
 	Port* cityArray;
-	StackAr<EdgeRoute> solitaire;
+	BinaryHeap<EdgeRoute> solitaire;
 
 	VaccineRouter(CityInfo cities[], int numCities);
     bool runBFT(); 
