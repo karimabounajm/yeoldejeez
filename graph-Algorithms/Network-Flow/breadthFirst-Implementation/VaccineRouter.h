@@ -57,7 +57,7 @@ public:
 	Queue<EdgeRoute> solitaire;
 
 	VaccineRouter(CityInfo cities[], int numCities);
-    bool runBFT(); 
+    bool runBFS(); 
 	int setFlow(int numAirports, int sinks[], int numSinks);
 };
 

@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.s": "asm-intel-x86-generic",
+        "iostream": "cpp",
+        "iosfwd": "cpp",
+        "__locale": "cpp",
+        "new": "cpp",
+        "ostream": "cpp"
+    }
+}

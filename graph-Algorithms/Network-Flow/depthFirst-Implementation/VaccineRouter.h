@@ -57,7 +57,7 @@ public:
 	StackAr<EdgeRoute> solitaire;
 
 	VaccineRouter(CityInfo cities[], int numCities);
-    bool runBFT(); 
+    bool runDFS(); 
 	int setFlow(int numAirports, int sinks[], int numSinks);
 };
 

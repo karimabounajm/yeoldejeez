@@ -57,7 +57,7 @@ public:
 	BinaryHeap<EdgeRoute> solitaire;
 
 	VaccineRouter(CityInfo cities[], int numCities);
-    bool runBFT(); 
+    bool runDij(); 
 	int setFlow(int numAirports, int sinks[], int numSinks);
 };
 

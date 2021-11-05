@@ -86,7 +86,7 @@ int VaccineRouter::setFlow(int numAirports, int sinks[], int numSinks)
 	int bufRemove;
 
 	// running BFT while reaching a sink is possible
-	while(runDFT()) {
+	while(runDij()) {
 		// incrementing worldclock for visiting
 		worldClock++;
 
@@ -141,7 +141,7 @@ int VaccineRouter::setFlow(int numAirports, int sinks[], int numSinks)
 
 
 // running a depth first traversal 
-bool VaccineRouter::runDFT() 
+bool VaccineRouter::runDij() 
 {
 	// insert all sources, in this implementation only 2 sources
 	for(int i = 0; i < 2; i++) {
