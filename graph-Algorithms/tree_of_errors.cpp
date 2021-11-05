@@ -2,7 +2,6 @@
 #include <iostream>
 #include <stack>
 
-using namespace std;
 const int num_alph = 26;
 
 
@@ -32,7 +31,7 @@ class Node {
         }
 };
 
-
+// a class used to construct binary tree, and return errors if any
 class BinaryTree {
     public:
         // creating an array of all the possible nodes;
@@ -51,11 +50,11 @@ class BinaryTree {
           	// Constructs Graph and also Checks for E1, E2, E3 Errors
             int error = _construct(input);
 			// Check if errors E1, E2, or E3
-			if(error > 0) this->result = "E" + to_string(error);
+			if(error > 0) this->result = "E" + std::to_string(error);
             else {
 				// Check for Errors E4, E5; otherwise Print Tree
                 error = checkGraph();
-                if(error > 0) this->result = "E" + to_string(error);
+                if(error > 0) this->result = "E" + std::to_string(error);
                 else this->result = "("+ representTree(nodes[root]) + ")";
             }
         }
@@ -125,7 +124,7 @@ class BinaryTree {
           	// creating array of values to check if visited, finding cycles
           	int visited[num_alph] = {0};
           	// performing DFS using root found to find cycles, checking for E5
-          	stack<int> stack_node;
+          	std::stack<int> stack_node;
           	stack_node.push(this->root);
           	while(!stack_node.empty()) {
               	int node = stack_node.top();
@@ -147,19 +146,19 @@ class BinaryTree {
         std::string representTree(Node node) {
 			// checking if the node has no children
 			if(node.num_edges == 0) {
-				return string(1, char(node.id+'A'));
+				return std::string(1, char(node.id+'A'));
 			}
 			// checking if the node has only one child
 			if(node.num_edges == 1) {
-				return string(1, char(node.id+'A')) + "(" + representTree(nodes[node.edges[0]]) + ")";
+				return std::string(1, char(node.id+'A')) + "(" + representTree(nodes[node.edges[0]]) + ")";
 			}
 			// if the node has two children (verified by the problem), order alphabetically
 			if(node.edges[1] < node.edges[0]) {
-				return string(1, char(node.id+'A')) + "(" + representTree(nodes[node.edges[1]]) + ")" \
+				return std::string(1, char(node.id+'A')) + "(" + representTree(nodes[node.edges[1]]) + ")" \
 					 + "(" + representTree(nodes[node.edges[0]]) + ")";
 			}
 			else {
-				return string(1, char(node.id+'A')) + "(" + representTree(nodes[node.edges[0]]) + ")" \
+				return std::string(1, char(node.id+'A')) + "(" + representTree(nodes[node.edges[0]]) + ")" \
 					 + "(" + representTree(nodes[node.edges[1]]) + ")";
 			}
 		}
@@ -167,11 +166,11 @@ class BinaryTree {
 
 int main() {
     std::string input;
-    getline(cin, input);
+    getline(std::cin, input);
 	// calling the class constructor for the graph, and solving the 
 	// resulting graph for errors in O(n) time
     BinaryTree graph = BinaryTree(input);
-    cout << graph.result << endl;
+    std::cout << graph.result << std::endl;
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */
     return 0;
 }
